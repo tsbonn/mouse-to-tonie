@@ -11,6 +11,8 @@ import os
 import time
 import logging
 
+# license: This code is released under the MIT License
+
 # Set up logging to both console and the same log file as main.py
 log_file_path = os.path.join(os.path.dirname(__file__), "mouse_to_tonie.log")
 logging.basicConfig(

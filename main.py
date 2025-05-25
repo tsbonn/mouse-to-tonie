@@ -5,6 +5,8 @@ from tonie_api.api import TonieAPI
 from downloader import download_latest_episode_selenium
 from datetime import datetime
 
+# license: This code is released under the MIT License
+
 # Set up detailed logging to both console and file
 log_file_path = os.path.join(os.path.dirname(__file__), "mouse_to_tonie.log")
 logging.basicConfig(
