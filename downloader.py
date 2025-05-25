@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -20,6 +21,7 @@ def download_latest_episode_selenium(url, save_path="."):
     pip install requests beautifulsoup4 selenium
 
     Ensure you have the Chrome WebDriver installed and available in your PATH.
+    If you get an error, try commenting in the service line in the code below.
 
     Args:
         url (str): The URL of the webpage containing the podcast episodes.
@@ -33,9 +35,12 @@ def download_latest_episode_selenium(url, save_path="."):
     try:
         # 1. Configure Selenium WebDriver
         chrome_options = Options()
-        chrome_options.add_argument(
-            "--headless"
-        )  # Headless mode: no visible browser window
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        # Uncomment the next lines if you have a specific path to the ChromeDriver
+        # service = Service('/path/to/chromedriver')  # Specify your path to chromedriver, e.g., '/usr/local/bin/chromedriver'
+        # driver = webdriver.Chrome(service=service, options=chrome_options)
         driver = webdriver.Chrome(options=chrome_options)
 
         # 2. Fetch the webpage with Selenium
