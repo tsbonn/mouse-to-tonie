@@ -9,6 +9,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 import os
 import time
+import logging
+
+# Set up logging to both console and the same log file as main.py
+log_file_path = os.path.join(os.path.dirname(__file__), "mouse_to_tonie.log")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(log_file_path, encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
 
 
 def download_latest_episode_selenium(url, save_path="."):
@@ -43,6 +56,7 @@ def download_latest_episode_selenium(url, save_path="."):
         # driver = webdriver.Chrome(service=service, options=chrome_options)
         driver = webdriver.Chrome(options=chrome_options)
 
+        logger.info(f"Fetching page: {url}")
         # 2. Fetch the webpage with Selenium
         driver.get(url)
 
@@ -82,7 +96,7 @@ def download_latest_episode_selenium(url, save_path="."):
 
         # If no direct .mp3 link found, try looking for common download link texts
         if not mp3_url:
-            print("No direct .mp3 link found. Trying to find links by text content.")
+            logger.warning("No direct .mp3 link found. Trying to find links by text content.")
             keywords = ["mp3-downloadpodcast", "Download", "herunterladen", "Podcast"]
             for link in soup.find_all("a", href=True):
                 if any(
@@ -98,7 +112,7 @@ def download_latest_episode_selenium(url, save_path="."):
                         break
 
         if mp3_url:
-            print(f"Found mp3-url: {mp3_url}")
+            logger.info(f"Found mp3-url: {mp3_url}")
 
             # 6. Download the MP3 file
             response_mp3 = requests.get(mp3_url, stream=True)
@@ -121,19 +135,18 @@ def download_latest_episode_selenium(url, save_path="."):
                 for chunk in response_mp3.iter_content(chunk_size=8192):
                     file.write(chunk)
 
-            print(f"Latest episode saved at: {full_path}")
+            logger.info(f"Latest episode saved at: {full_path}")
             return full_path
         else:
-            print("No direct mp3-link found on given page.")
-            print("Maybe the website structure has changed,")
-            print("or the correct link is hidden deeper in some JavaScript-structure.")
+            logger.warning("No direct mp3-link found on given page.")
+            logger.warning("Maybe the website structure has changed, or the correct link is hidden deeper in some JavaScript-structure.")
             return None
 
     except requests.exceptions.RequestException as e:
-        print(f"Exception on performing request of website or mp3-file: {e}")
+        logger.error(f"Exception on performing request of website or mp3-file: {e}")
         return None
     except Exception as e:
-        print(f"An unknown exception occured: {e}")
+        logger.error(f"An unknown exception occured: {e}")
         return None
     finally:
         if driver:
