@@ -14,7 +14,7 @@ try:
     username = config["api_credentials"]["username"]
     password = config["api_credentials"]["password"]
     creative_tonie_name = config["tonie_config"]["creative_tonie_name"]
-    clear_all_before_upload = config["app_config"]["clear_all_before_upload"] == "True"
+    clear_all_chapters_before_upload = config["app_config"]["clear_all_chapters_before_upload"] == "True"
     keep_downloaded_files = config["app_config"]["keep_downloaded_files"] == "True"
     download_url = config["app_config"]["download_url"]
     data_dir = config["app_config"]["data_dir"]
@@ -45,7 +45,7 @@ if downloaded_file is not None:
 
     if selected_tonie:
         print(f"Found CreativeTonie: {selected_tonie.name}")
-        if clear_all_before_upload:
+        if clear_all_chapters_before_upload:
             api.clear_all_chapter_of_tonie(selected_tonie)
             print(f"Cleared all chapters of the Tonie {selected_tonie.name}")
         api.upload_file_to_tonie(
@@ -56,3 +56,11 @@ if downloaded_file is not None:
         print(f"Uploaded file {downloaded_file} to Tonie {selected_tonie.name}")
     else:
         print(f"No CreativeTonie found with the name '{selected_tonie.name}'")
+
+# Clean up downloaded files if keep_downloaded_files is False
+if not keep_downloaded_files and downloaded_file is not None:
+    try:
+        os.remove(downloaded_file)
+        print(f"Removed downloaded file: {downloaded_file}")
+    except OSError as e:
+        print(f"Error removing file {downloaded_file}: {e}")
